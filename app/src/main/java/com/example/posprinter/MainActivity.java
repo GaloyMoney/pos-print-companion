@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         btnPrintText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                printText();
+                printText("sid" , "12 USD" , "20 SATS");
             }
         });
 
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         printerService.printText(value + "\n", valueFormat);
     }
 
-    private void printText() {
+    private void printText( String username, String amount, String sats) {
         singleThreadExecutor.submit(new Runnable() {
             @Override
             public void run() {
@@ -98,9 +98,9 @@ public class MainActivity extends AppCompatActivity {
                     headingFormat.setTextSize(32);
                     printerService.printText("BLINK POS\n\n", headingFormat);
 
-                    printKeyValueBelow("Username:", "Siddharth");
-                    printKeyValueBelow("Amount:", "$12 USD");
-                    printKeyValueBelow("Sats:", "12 Sats");
+                    printKeyValueBelow("Username:", username);
+                    printKeyValueBelow("Amount:", amount);
+                    printKeyValueBelow("Sats:", sats);
                     paperOut();
                 } catch (RemoteException e) {
                     e.printStackTrace();
