@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             printerService = IPrinterService.Stub.asInterface(service);
             isPrinterServiceBound = true;
             if (pendingPrintData != null) {
-                printText(pendingPrintData[0], pendingPrintData[1], pendingPrintData[2]);
+                PrintReceipt(pendingPrintData[0], pendingPrintData[1], pendingPrintData[2]);
                 pendingPrintData = null;
             }
         }
@@ -61,14 +61,12 @@ public class MainActivity extends AppCompatActivity {
         String type = intent.getType();
         if (Intent.ACTION_VIEW.equals(action)) {
             Uri data = intent.getData();
-            Log.d("IntentHandling", "data: ===> " + data);
-
             if (data != null) {
                 String username = data.getQueryParameter("username");
                 String amount = data.getQueryParameter("amount");
                 String sats = data.getQueryParameter("sats");
                 if (isPrinterServiceBound) {
-                    printText(username, amount, sats);
+                    PrintReceipt(username, amount, sats);
                 } else {
                     pendingPrintData = new String[]{username, amount, sats};
                 }
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         printerService.printText(value + "\n", valueFormat);
     }
 
-    private void printText(String username, String amount, String sats) {
+    private void PrintReceipt(String username, String amount, String sats) {
         singleThreadExecutor.submit(() -> {
             try {
                 PrintTextFormat headingFormat = new PrintTextFormat();
