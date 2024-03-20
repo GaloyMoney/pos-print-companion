@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 String dashedLine = new String(new char[32]).replace("\0", "-");
 
                 Bitmap originalBitmap = BitmapFactory.decodeStream(getAssets().open("blink-logo.png"));
-                int maxWidthPixels = 280;
+                int maxWidthPixels = 200;
                 double aspectRatio = (double) originalBitmap.getWidth() / originalBitmap.getHeight();
                 int newHeight = (int) (maxWidthPixels / aspectRatio);
                 Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, maxWidthPixels, newHeight, true);
