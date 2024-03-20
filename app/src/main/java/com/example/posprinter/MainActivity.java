@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private IPrinterService printerService;
     private ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     private boolean isPrinterServiceBound = false;
-    private String[] pendingPrintData = null; // Temporary storage for print data
+    private String[] pendingPrintData = null;
 
     private ServiceConnection connService = new ServiceConnection() {
         @Override
@@ -43,13 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        Button btnPaper = findViewById(R.id.btn_paper);
-        btnPaper.setOnClickListener(v -> paperOut());
-
-        Button btnPrintText = findViewById(R.id.btn1);
-        btnPrintText.setOnClickListener(v -> printText("sid", "12 USD", "20 SATS"));
 
         bindService();
         handleSendText(getIntent());
@@ -65,23 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleSendText(Intent intent) {
         String action = intent.getAction();
         String type = intent.getType();
-        Log.d("IntentHandling", "Action:=======> " + action);
-        Log.d("IntentHandling", "Type: " + type);
-
-        if (Intent.ACTION_SEND.equals(action) && "text/plain".equals(type)) {
-            String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-            if (sharedText != null) {
-                String[] parts = sharedText.split(";");
-                if (parts.length == 3) {
-                    if (isPrinterServiceBound) {
-                        printText(parts[0], parts[1], parts[2]);
-                    } else {
-                        pendingPrintData = parts;
-                    }
-                }
-                finish();
-            }
-        } else if (Intent.ACTION_VIEW.equals(action)) {
+        if (Intent.ACTION_VIEW.equals(action)) {
             Uri data = intent.getData();
             Log.d("IntentHandling", "data: ===> " + data);
 
