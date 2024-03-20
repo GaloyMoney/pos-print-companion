@@ -1,27 +1,28 @@
 package com.example.posprinter;
 
 import android.content.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
-import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import net.nyx.printerservice.print.IPrinterService;
 import net.nyx.printerservice.print.PrintTextFormat;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
     private IPrinterService printerService;
     private ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     private boolean isPrinterServiceBound = false;
     private String[] pendingPrintData = null;
-
     private ServiceConnection connService = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -43,8 +44,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         bindService();
         handleSendText(getIntent());
     }
@@ -64,11 +63,11 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 String username = data.getQueryParameter("username");
                 String amount = data.getQueryParameter("amount");
-                String sats = data.getQueryParameter("sats");
+                String paymentHash = data.getQueryParameter("paymentHash");
                 if (isPrinterServiceBound) {
-                    PrintReceipt(username, amount, sats);
+                    PrintReceipt(username, amount, paymentHash);
                 } else {
-                    pendingPrintData = new String[]{username, amount, sats};
+                    pendingPrintData = new String[]{username, amount, paymentHash};
                 }
                 finish();
             }
@@ -92,37 +91,63 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void printKeyValueBelow(String key, String value) throws RemoteException {
-        PrintTextFormat keyFormat = new PrintTextFormat();
-        keyFormat.setStyle(1);
-        keyFormat.setUnderline(true);
-        keyFormat.setTextSize(24);
-        PrintTextFormat valueFormat = new PrintTextFormat();
-        valueFormat.setStyle(0);
-        valueFormat.setTextSize(32);
-        printerService.printText(key, keyFormat);
-        printerService.printText(value + "\n", valueFormat);
-    }
-
-    private void PrintReceipt(String username, String amount, String sats) {
+    private void PrintReceipt(String username, String amount, String paymentHash) {
         singleThreadExecutor.submit(() -> {
             try {
-                PrintTextFormat headingFormat = new PrintTextFormat();
-                headingFormat.setStyle(1);
-                headingFormat.setUnderline(true);
-                headingFormat.setAli(1);
-                headingFormat.setTextSize(32);
-                printerService.printText("BLINK POS\n\n", headingFormat);
+                PrintTextFormat dashedFormat = new PrintTextFormat();
 
-                printKeyValueBelow("Username:", username);
-                printKeyValueBelow("Amount:", amount);
-                printKeyValueBelow("Sats:", sats);
+                dashedFormat.setStyle(0);
+                dashedFormat.setTextSize(27);
+                dashedFormat.setAli(1);
+                dashedFormat.setStyle(1);
+
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                String date = dateFormat.format(new Date());
+
+                String dashedLine = new String(new char[32]).replace("\0", "-");
+
+                Bitmap originalBitmap = BitmapFactory.decodeStream(getAssets().open("blink-logo.png"));
+                int maxWidthPixels = 280;
+                double aspectRatio = (double) originalBitmap.getWidth() / originalBitmap.getHeight();
+                int newHeight = (int) (maxWidthPixels / aspectRatio);
+                Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, maxWidthPixels, newHeight, true);
+
+                printerService.printBitmap(resizedBitmap, 1, 1);
+
+                printerService.printText( dashedLine, dashedFormat);
+
+                printDynamicKeyValue("Username:" ,"     ", username);
+                printDynamicKeyValue("Amount:","         ", amount);
+                printDynamicKeyValue("Time:","              ", date);
+
+                printerService.printText( dashedLine , dashedFormat);
+
+                PrintTextFormat formatTxid = new PrintTextFormat();
+                formatTxid.setAli(1);
+                formatTxid.setTextSize(23);
+                formatTxid.setStyle(1);
+                printerService.printText("Payment Hash", formatTxid);
+                printerService.printText(paymentHash, formatTxid);
+                printerService.printText("\n", formatTxid);
                 paperOut();
             } catch (RemoteException e) {
                 e.printStackTrace();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
     }
+
+    private void printDynamicKeyValue(String key, String space ,String value) throws RemoteException {
+        PrintTextFormat textFormat = new PrintTextFormat();
+        textFormat.setStyle(0);
+        textFormat.setTextSize(23);
+        textFormat.setStyle(1);
+        printerService.printText(key + space + value , textFormat);
+    }
+
 
     @Override
     protected void onDestroy() {
