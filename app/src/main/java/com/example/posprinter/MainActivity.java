@@ -102,9 +102,13 @@ public class MainActivity extends AppCompatActivity {
                 dashedFormat.setStyle(1);
 
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                String date = dateFormat.format(new Date());
+                timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                String currentDate = dateFormat.format(new Date());
+                String currentTime = timeFormat.format(new Date());
 
                 String dashedLine = new String(new char[32]).replace("\0", "-");
 
@@ -118,9 +122,10 @@ public class MainActivity extends AppCompatActivity {
 
                 printerService.printText( dashedLine, dashedFormat);
 
-                printDynamicKeyValue("Username:" ,"     ", username);
-                printDynamicKeyValue("Amount:","         ", amount);
-                printDynamicKeyValue("Time:","              ", date);
+                printDynamicKeyValue("Username:" ,"    ", username);
+                printDynamicKeyValue("Amount:","        ", amount);
+                printDynamicKeyValue("Date:","              ", currentDate);
+                printDynamicKeyValue("Time:","             ", currentTime);
 
                 printerService.printText( dashedLine , dashedFormat);
 
