@@ -1,0 +1,188 @@
+#@ load("@ytt:data", "data")
+
+#@ def pipeline_image():
+#@   return data.values.docker_registry + "/pos-print-companion"
+#@ end
+
+#@ def release_pipeline_image():
+#@   return data.values.docker_registry + "/release-pipeline"
+#@ end
+
+#@ def task_image_config():
+type: registry-image
+source:
+  username: #@ data.values.docker_registry_user
+  password: #@ data.values.docker_registry_password
+  repository: #@ pipeline_image()
+#@ end
+
+#@ def release_task_image_config():
+type: registry-image
+source:
+  username: #@ data.values.docker_registry_user
+  password: #@ data.values.docker_registry_password
+  repository: #@ release_pipeline_image()
+#@ end
+
+resource_types:
+  - name: gcs-resource
+    type: docker-image
+    source:
+      repository: frodenas/gcs-resource
+
+resources:
+  - name: repo
+    type: git
+    webhook_token: ((webhook.secret))
+    source:
+      uri: #@ data.values.git_uri
+      branch: #@ data.values.git_branch
+      private_key: #@ data.values.github_private_key
+  - name: pipeline-tasks
+    type: git
+    source:
+      paths: [ "ci/*" ]
+      uri: #@ data.values.git_uri
+      branch: #@ data.values.pipeline_git_branch
+      private_key: #@ data.values.github_private_key
+  - name: pipeline-image-def
+    type: git
+    source:
+      paths: [ci/image/Dockerfile]
+      uri: #@ data.values.git_uri
+      branch: #@ data.values.pipeline_git_branch
+      private_key: #@ data.values.github_private_key
+  - name: gh-release
+    type: github-release
+    source:
+      owner: #@ data.values.gh_org
+      repository: #@ data.values.gh_repository
+      access_token: #@ data.values.github_api_token
+      release: true
+  - name: built-dev-apk
+    type: gcs-resource
+    source:
+      bucket: #@ data.values.build_artifacts_bucket_name
+      json_key: #@ data.values.build_artifacts_bucket_creds
+      regexp: pos-print-companion/dev/android/pos-print-companion-(.+)-v.+/apk/release/app-release-unsigned.apk
+  - name: version
+    type: semver
+    source:
+      initial_version: 0.0.0
+      driver: git
+      file: version
+      uri: #@ data.values.git_uri
+      branch: #@ data.values.git_version_branch
+      private_key: #@ data.values.github_private_key
+  - name: pipeline-image
+    type: registry-image
+    source:
+      tag: latest
+      username: #@ data.values.docker_registry_user
+      password: #@ data.values.docker_registry_password
+      repository: #@ pipeline_image()
+
+groups:
+  - name: pos-companion
+    jobs:
+      - build
+      - release
+  - name: image
+    jobs:
+      - build-pipeline-image
+
+jobs:
+  - name: build-pipeline-image
+    serial: true
+    plan:
+      - get: pipeline-image-def
+        trigger: true
+      - task: build
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: vito/oci-build-task
+          inputs:
+            - name: pipeline-image-def
+          outputs:
+            - name: image
+          params:
+            CONTEXT: pipeline-image-def/ci/image
+          run:
+            path: build
+      - put: pipeline-image
+        params:
+          image: image/image.tar
+
+  - name: build
+    serial: true
+    plan:
+      - in_parallel:
+          - { get: repo, trigger: true }
+          - get: pipeline-tasks
+      - task: build
+        config:
+          platform: linux
+          image_resource: #@ task_image_config()
+          inputs:
+            - name: pipeline-tasks
+            - name: repo
+          outputs:
+            - name: repo
+            - name: artifacts
+          run:
+            path: pipeline-tasks/ci/tasks/build.sh
+
+      - task: upload-to-gcs
+        config:
+          platform: linux
+          image_resource: #@ task_image_config()
+          inputs:
+            - name: repo
+            - name: artifacts
+            - name: pipeline-tasks
+          run:
+            path: pipeline-tasks/ci/tasks/upload-to-gcs.sh
+          params:
+            VERSION_FILE: repo/.git/ref
+            GCS_DIRECTORY: dev
+            bucket: #@ data.values.build_artifacts_bucket_name
+            json_key: #@ data.values.build_artifacts_bucket_creds
+
+  - name: release
+    serial: true
+    plan:
+      - in_parallel:
+          - get: repo
+            trigger: true
+            passed: [ build ]
+          - get: pipeline-tasks
+          - get: version
+          - get: built-dev-apk
+          - get: pipeline-tasks
+      - task: prep-release
+        config:
+          platform: linux
+          image_resource: #@ release_task_image_config()
+          inputs:
+            - name: repo
+            - name: pipeline-tasks
+            - name: version
+            - name: artifacts
+          outputs:
+            - name: version
+            - name: artifacts
+          run:
+            path: pipeline-tasks/ci/vendor/tasks/prep-release-src.sh
+      - in_parallel:
+          - put: gh-release
+            params:
+              name: artifacts/gh-release-name
+              tag: artifacts/gh-release-tag
+              body: artifacts/gh-release-notes.md
+          - put: version
+            params:
+              file: version/version
