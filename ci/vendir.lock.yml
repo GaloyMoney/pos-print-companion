@@ -1,0 +1,15 @@
+apiVersion: vendir.k14s.io/v1alpha1
+directories:
+- contents:
+  - git:
+      commitTitle: 'fix: allow versioned img uploading to private repo (#41)'
+      sha: 0f5b967c838dbb9496da86453c0eece933a556a9
+    path: .
+  path: ../.github/workflows/vendor
+- contents:
+  - git:
+      commitTitle: 'fix: allow versioned img uploading to private repo (#41)'
+      sha: 0f5b967c838dbb9496da86453c0eece933a556a9
+    path: .
+  path: ./vendor
+kind: LockConfig
