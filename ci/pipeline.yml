@@ -145,7 +145,7 @@ jobs:
             - name: pipeline-tasks
           run:
             path: /bin/bash
-            args: ["-c", "chmod +x pipeline-tasks/ci/tasks/build.sh && pipeline-tasks/ci/tasks/build.sh"]
+            args: ["-c", "chmod +x pipeline-tasks/ci/tasks/upload-to-gcs.sh && pipeline-tasks/ci/tasks/upload-to-gcs.sh"]
           params:
             VERSION_FILE: repo/.git/ref
             GCS_DIRECTORY: dev
