@@ -1,5 +1,5 @@
 #used commands from here: https://github.com/MobileDevOps/android-sdk-image
-
+FROM --platform=linux/amd64 ubuntu:24.04
 ENV ANDROID_SDK_TOOLS_VERSION 11076708
 ENV ANDROID_SDK_TOOLS_CHECKSUM 2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258
 
@@ -39,7 +39,8 @@ RUN apt-get -qq update \
     unzip \
     curl \
     lldb \
-    git > /dev/null \
+    git \
+    wget > /dev/null \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
    
 RUN curl -s https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS_VERSION}_latest.zip > /tools.zip \
