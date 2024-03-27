@@ -39,8 +39,8 @@ RUN curl -s "https://get.sdkman.io" | bash && \
     bash -c "source $HOME/.sdkman/bin/sdkman-init.sh && sdk install gradle ${GRADLE_VERSION}"
 
 # install Google Cloud SDK
-RUN curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=${HOME} && \
-    echo 'export PATH=$PATH:${HOME}/google-cloud-sdk/bin' >> $HOME/.bashrc
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 # install gh-token
 RUN wget -O ghtoken https://github.com/Link-/gh-token/releases/download/v${GHTOKEN_VERSION}/linux-amd64 && \
