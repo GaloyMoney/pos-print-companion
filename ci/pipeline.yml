@@ -162,7 +162,6 @@ jobs:
           - get: pipeline-tasks
           - get: version
           - get: built-dev-apk
-          - get: pipeline-tasks
       - task: prep-release
         config:
           platform: linux

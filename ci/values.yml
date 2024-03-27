@@ -1,20 +1,19 @@
 #@data/values
 ---
 git_uri: git@github.com:GaloyMoney/pos-print-companion.git
-git_branch: main
+git_branch: ci--adding-concourse-ci
+pipeline_git_branch: ci--adding-concourse-ci
 github_private_key: ((github.private_key))
-github_token: ((github.api_token))
-github_app_id: ((github.github_app_id))
-github_app_private_key: ((github.github_app_private_key))
+github_api_token: ((github.api_token))
+
 
 docker_registry: us.gcr.io/galoy-org
 docker_registry_user: ((docker-creds.username))
 docker_registry_password: ((docker-creds.password))
 
-git_version_branch: main
+git_version_branch: ci--adding-concourse-ci
 gh_org: GaloyMoney
 gh_repository: pos-print-companion
 
 build_artifacts_bucket_name: galoy-build-artifacts
 build_artifacts_bucket_creds: ((build-artifacts-bucket-creds.creds_json))
-artifacts_bucket_name: ((staging-gcp-creds.bucket_name))
