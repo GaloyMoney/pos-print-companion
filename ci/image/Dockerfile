@@ -57,6 +57,22 @@ RUN mkdir -p /home/mobiledevops/.android \
     && mkdir -p /home/mobiledevops/app \
     && touch /home/mobiledevops/.android/repositories.cfg
 
+ENV HOME /home/mobiledevops
+WORKDIR $HOME/app
+
+RUN curl -s "https://get.sdkman.io" | bash
+SHELL ["/bin/bash", "-c"]
+
+#ADD packages.txt $HOME
+#RUN $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --update \
+#    && while read -r pkg; do PKGS="${PKGS}${pkg} "; done < $HOME/packages.txt \
+#    && $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} $PKGS \
+#    && rm $HOME/packages.txt
+
+
+RUN source "${HOME}/.sdkman/bin/sdkman-init.sh" \
+    && sdk install gradle ${GRADLE_VERSION}
+
 RUN wget -O ghtoken \
   https://github.com/Link-/gh-token/releases/download/v${GHTOKEN_VERSION}/linux-amd64 && \
   echo "f76e8cb35f0b04b59073a486cc952e50fa9f1c930a25619ea9abcf44a13165c4  ghtoken" | \
