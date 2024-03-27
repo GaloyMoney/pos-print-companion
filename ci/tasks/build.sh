@@ -1,10 +1,11 @@
-#!/bin/zsh
+#!/bin/bash
 
 set -eu
-export CI_ROOT="$(pwd)"
-export BUILD_NUMBER=$(cat ${CI_ROOT}/build-number-android/android)
 
+current_dir=$(pwd)
+cd repo/
 ./gradlew build
+cd "$current_dir"
 
-mkdir -p artifacts/android/app/build/outputs
-cp -r app/build/outputs/* artifacts/android/app/build/outputs
+mkdir -p artifacts/app/build/outputs/apk
+cp -r repo/app/build/outputs/apk/* artifacts/app/build/outputs/apk

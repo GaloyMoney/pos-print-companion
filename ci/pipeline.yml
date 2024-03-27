@@ -128,13 +128,12 @@ jobs:
           platform: linux
           image_resource: #@ task_image_config()
           inputs:
-            - name: pipeline-tasks
             - name: repo
           outputs:
             - name: repo
             - name: artifacts
           run:
-            path: pipeline-tasks/ci/tasks/build.sh
+            path: repo/ci/tasks/build.sh
 
       - task: upload-to-gcs
         config:

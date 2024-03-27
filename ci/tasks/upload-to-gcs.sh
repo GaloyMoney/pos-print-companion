@@ -9,4 +9,4 @@ gcloud auth activate-service-account --key-file key.json
 
 pushd artifacts
 
-gsutil cp -r app/build/outputs/apk/release/* gs://$bucket/pos-print-companion/$GCS_DIRECTORY/android/pos-print-companion-$(date +%s)-v${version}/
+gsutil cp -r app/build/outputs/apk/release/* gs://$bucket/pos-print-companion/$GCS_DIRECTORY/android/pos-print-companion-$(date +%s)-v${version}/apk/release/
