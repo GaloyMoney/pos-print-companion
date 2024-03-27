@@ -144,7 +144,8 @@ jobs:
             - name: artifacts
             - name: pipeline-tasks
           run:
-            path: pipeline-tasks/ci/tasks/upload-to-gcs.sh
+            path: /bin/bash
+            args: ["-c", "chmod +x pipeline-tasks/ci/tasks/build.sh && pipeline-tasks/ci/tasks/build.sh"]
           params:
             VERSION_FILE: repo/.git/ref
             GCS_DIRECTORY: dev
@@ -174,7 +175,8 @@ jobs:
             - name: version
             - name: artifacts
           run:
-            path: pipeline-tasks/ci/vendor/tasks/prep-release-src.sh
+            path: /bin/bash
+            args: ["-c", "chmod +x pipeline-tasks/ci/vendor/tasks/prep-release-src.sh && pipeline-tasks/ci/vendor/tasks/prep-release-src.sh"]
       - in_parallel:
           - put: gh-release
             params:
