@@ -5,6 +5,9 @@ set -eu
 version=$(cat $VERSION_FILE)
 
 echo $json_key > key.json
+
+whoami
+
 gcloud auth activate-service-account --key-file key.json
 
 pushd artifacts
