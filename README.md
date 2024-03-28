@@ -12,7 +12,7 @@ This Android app is a wrapper for the [NyxPrinterClient](https://github.com/yyzz
 
 ## Building the App
 
-To build the app, you need to have the Java Development Kit (JDK) installed on your computer. Use the following command to compile the app:
+To build the app, you need to have the Java Development Kit (JDK-17) installed on your computer. Use the following command to compile the app:
 
 ```shell
 ./gradlew build
