@@ -11,7 +11,7 @@ docker_registry: us.gcr.io/galoy-org
 docker_registry_user: ((docker-creds.username))
 docker_registry_password: ((docker-creds.password))
 
-git_version_branch: main
+git_version_branch: version
 gh_org: GaloyMoney
 gh_repository: pos-print-companion
 
