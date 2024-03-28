@@ -181,6 +181,8 @@ jobs:
               name: artifacts/gh-release-name
               tag: artifacts/gh-release-tag
               body: artifacts/gh-release-notes.md
+              globs:
+                - built-dev-apk/app-release-unsigned.apk
           - put: version
             params:
               file: version/version
