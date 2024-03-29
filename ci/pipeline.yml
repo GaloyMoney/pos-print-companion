@@ -64,7 +64,7 @@ resources:
     source:
       bucket: #@ data.values.build_artifacts_bucket_name
       json_key: #@ data.values.build_artifacts_bucket_creds
-      regexp: pos-print-companion/dev/android/pos-print-companion-(.+)-v.+/apk/release/app-debug.apk.apk
+      regexp: pos-print-companion/dev/android/pos-print-companion-(.+)-v.+/apk/release/app-debug.apk
   - name: version
     type: semver
     source:
@@ -182,7 +182,7 @@ jobs:
               tag: artifacts/gh-release-tag
               body: artifacts/gh-release-notes.md
               globs:
-                - built-dev-apk/app-debug.apk.apk
+                - built-dev-apk/app-debug.apk
           - put: version
             params:
               file: version/version
