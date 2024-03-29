@@ -64,7 +64,7 @@ resources:
     source:
       bucket: #@ data.values.build_artifacts_bucket_name
       json_key: #@ data.values.build_artifacts_bucket_creds
-      regexp: pos-print-companion/dev/android/pos-print-companion-(.+)-v.+/apk/release/app-debug.apk
+      regexp: pos-print-companion/dev/android/pos-print-companion-(.+)-v.+/apk/debug/app-debug.apk
   - name: version
     type: semver
     source:
