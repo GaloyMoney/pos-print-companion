@@ -1,4 +1,4 @@
-package com.example.posprinter;
+package com.blink.pos.companion;
 
 import android.content.Context;
 

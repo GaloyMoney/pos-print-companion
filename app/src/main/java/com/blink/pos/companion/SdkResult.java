@@ -1,4 +1,4 @@
-package com.example.posprinter;
+package com.blink.pos.companion;
 
 public class SdkResult {
     public static final int SDK_OK                              = 0;
