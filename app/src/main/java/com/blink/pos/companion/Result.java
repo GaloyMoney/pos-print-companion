@@ -1,4 +1,6 @@
-package com.blink.posprinter;
+package com.blink.pos.companion;
+
+import com.blink.pos.companion.R;
 
 public class Result {
 

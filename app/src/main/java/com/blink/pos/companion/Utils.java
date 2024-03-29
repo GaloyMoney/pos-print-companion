@@ -1,4 +1,4 @@
-package com.blink.posprinter;
+package com.blink.pos.companion;
 
 import android.annotation.SuppressLint;
 import android.app.Application;

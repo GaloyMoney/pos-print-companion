@@ -1,4 +1,4 @@
-package com.blink.posprinter;
+package com.blink.pos.companion;
 
 import android.content.*;
 import android.graphics.Bitmap;

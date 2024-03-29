@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.blink.posprinter"
+    namespace = "com.blink.pos.companion"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.blink.posprinter"
+        applicationId = "com.blink.pos.companion"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
