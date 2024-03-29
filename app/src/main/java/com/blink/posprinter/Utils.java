@@ -1,4 +1,4 @@
-package com.example.posprinter;
+package com.blink.posprinter;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
