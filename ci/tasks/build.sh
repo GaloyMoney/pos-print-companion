@@ -2,6 +2,8 @@
 
 set -eu
 
+echo "$keystore" | base64 --decode > repo/app/pos-keystore
+
 current_dir=$(pwd)
 cd repo/
 ./gradlew build
