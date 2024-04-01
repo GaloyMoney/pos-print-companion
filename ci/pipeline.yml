@@ -157,7 +157,6 @@ jobs:
     plan:
       - in_parallel:
           - get: repo
-            trigger: true
             passed: [ build ]
           - get: pipeline-tasks
           - get: version
