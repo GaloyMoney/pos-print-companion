@@ -46,13 +46,36 @@
 
     <string name="print_text">I\'ve been living with a shadow overhead\nI\'ve been sleeping with a cloud above my bed\nI\'ve been lonely for so long\nTrapped in the past, I just can\'t seem to move on</string>
     <string name="asset_statements">
-      [{
-        \"relation\": [\"delegate_permission/common.handle_all_urls\"],
-        \"target\": {
-        \"namespace\": \"web\",
-        \"site\": \"https://pay.staging.blink.sv\"
-        }
-      }]
+        [
+          {
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://pay.staging.blink.sv\"
+            }
+          },
+          {
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://pay.staging.galoy.io\"
+            }
+          },
+          {
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://pay.blink.sv\"
+            }
+          },
+          {
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://pay.mainnet.galoy.io\"
+            }
+          }
+        ]
     </string>
 
 </resources>
