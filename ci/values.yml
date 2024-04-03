@@ -18,4 +18,4 @@ gh_repository: pos-print-companion
 build_artifacts_bucket_name: galoy-build-artifacts
 build_artifacts_bucket_creds: ((build-artifacts-bucket-creds.creds_json))
 
-keystore: ((keystore))
+keystore: ((pos-companion-keystore.keystore))
