@@ -65,6 +65,12 @@ resources:
       bucket: #@ data.values.build_artifacts_bucket_name
       json_key: #@ data.values.build_artifacts_bucket_creds
       regexp: pos-print-companion/dev/android/pos-print-companion-(.+)-v.+/apk/debug/app-debug.apk
+  - name: built-release-apk
+    type: gcs-resource
+    source:
+      bucket: #@ data.values.build_artifacts_bucket_name
+      json_key: #@ data.values.build_artifacts_bucket_creds
+      regexp: pos-print-companion/dev/android/pos-print-companion-(.+)-v.+/apk/release/app-release.apk    
   - name: version
     type: semver
     source:
@@ -135,6 +141,8 @@ jobs:
             - name: artifacts
           run:
             path: pipeline-tasks/ci/tasks/build.sh
+          params:
+            keystore: #@ data.values.keystore
 
       - task: upload-to-gcs
         config:
@@ -161,6 +169,7 @@ jobs:
           - get: pipeline-tasks
           - get: version
           - get: built-dev-apk
+          - get: built-release-apk
       - task: prep-release
         config:
           platform: linux
@@ -182,6 +191,7 @@ jobs:
               body: artifacts/gh-release-notes.md
               globs:
                 - built-dev-apk/app-debug.apk
+                - built-release-apk/app-release.apk
           - put: version
             params:
               file: version/version
