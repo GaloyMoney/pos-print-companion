@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
             printerService = IPrinterService.Stub.asInterface(service);
             isPrinterServiceBound = true;
             if (pendingPrintData != null) {
-                PrintReceipt(pendingPrintData[0], pendingPrintData[1], pendingPrintData[2]);
+                PrintReceipt(pendingPrintData[0], pendingPrintData[1], pendingPrintData[2], pendingPrintData[3], pendingPrintData[4], pendingPrintData[5]);
                 pendingPrintData = null;
             }
         }
@@ -64,10 +64,13 @@ public class MainActivity extends AppCompatActivity {
                 String username = data.getQueryParameter("username");
                 String amount = data.getQueryParameter("amount");
                 String paymentHash = data.getQueryParameter("paymentHash");
+                String transactionId = data.getQueryParameter("id");
+                String date = data.getQueryParameter("date");
+                String time = data.getQueryParameter("time");
                 if (isPrinterServiceBound) {
-                    PrintReceipt(username, amount, paymentHash);
+                    PrintReceipt(username, amount, paymentHash, transactionId, date , time );
                 } else {
-                    pendingPrintData = new String[]{username, amount, paymentHash};
+                    pendingPrintData = new String[]{username, amount, paymentHash, transactionId, date ,time};
                 }
                 finish();
             }
@@ -91,11 +94,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void PrintReceipt(String username, String amount, String paymentHash) {
+    private void PrintReceipt(String username, String amount, String paymentHash, String transactionId, String date, String time) {
         singleThreadExecutor.submit(() -> {
             try {
                 PrintTextFormat dashedFormat = new PrintTextFormat();
-
                 dashedFormat.setStyle(0);
                 dashedFormat.setTextSize(27);
                 dashedFormat.setAli(1);
@@ -106,36 +108,63 @@ public class MainActivity extends AppCompatActivity {
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
                 String currentDate = dateFormat.format(new Date());
                 String currentTime = timeFormat.format(new Date());
 
-                String dashedLine = new String(new char[32]).replace("\0", "-");
 
+                //Blink Logo
                 Bitmap originalBitmap = BitmapFactory.decodeStream(getAssets().open("blink-logo.png"));
                 int maxWidthPixels = 200;
                 double aspectRatio = (double) originalBitmap.getWidth() / originalBitmap.getHeight();
                 int newHeight = (int) (maxWidthPixels / aspectRatio);
                 Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, maxWidthPixels, newHeight, true);
-
                 printerService.printBitmap(resizedBitmap, 1, 1);
 
+
+                //dashed line
+                String dashedLine = new String(new char[32]).replace("\0", "-");
                 printerService.printText( dashedLine, dashedFormat);
 
+
+                //transaction data
                 printDynamicKeyValue("Username:" ,"    ", username);
                 printDynamicKeyValue("Amount:","        ", amount);
-                printDynamicKeyValue("Date:","              ", currentDate);
-                printDynamicKeyValue("Time:","             ", currentTime);
+                if (date != null && !date.isEmpty()) {
+                    printDynamicKeyValue("Date:","              ", date);
+                } else {
+                    printDynamicKeyValue("Date:","              ", currentDate);
+                }
+                if (time != null && !time.isEmpty()) {
+                    printDynamicKeyValue("Time:","             ", time);
+                }else{
+                    printDynamicKeyValue("Time:","             ", currentTime);
+                }
 
+
+                //dashed line
                 printerService.printText( dashedLine , dashedFormat);
 
+
+                //transaction hash
                 PrintTextFormat formatTxid = new PrintTextFormat();
                 formatTxid.setAli(1);
                 formatTxid.setTextSize(23);
                 formatTxid.setStyle(1);
-                printerService.printText("Payment Hash", formatTxid);
-                printerService.printText(paymentHash, formatTxid);
-                printerService.printText("\n", formatTxid);
+
+                if (transactionId != null && !transactionId.isEmpty()) {
+                    printerService.printText("Blink Internal Id", formatTxid);
+                    printerService.printText(transactionId, formatTxid);
+                    printerService.printText("\n", formatTxid);
+                }
+
+                if (paymentHash != null && !paymentHash.isEmpty()) {
+                    printerService.printText("Payment Hash", formatTxid);
+                    printerService.printText(paymentHash, formatTxid);
+                    printerService.printText("\n", formatTxid);
+                }
+
+
+                //stop printing
                 paperOut();
             } catch (RemoteException e) {
                 e.printStackTrace();
