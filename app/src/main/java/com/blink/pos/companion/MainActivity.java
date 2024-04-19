@@ -106,11 +106,10 @@ public class MainActivity extends AppCompatActivity {
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                dateFormat.setTimeZone(TimeZone.getDefault());
+                timeFormat.setTimeZone(TimeZone.getDefault());
                 String currentDate = dateFormat.format(new Date());
                 String currentTime = timeFormat.format(new Date());
-
 
                 //Blink Logo
                 Bitmap originalBitmap = BitmapFactory.decodeStream(getAssets().open("blink-logo.png"));
