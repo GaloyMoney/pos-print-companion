@@ -74,6 +74,20 @@
                 \"namespace\": \"web\",
                 \"site\": \"https://pay.mainnet.galoy.io\"
             }
+          },
+          {
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://voucher.staging.blink.sv\"
+            }
+          },
+          {
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://voucher.blink.sv\"
+            }
           }
         ]
     </string>
