@@ -91,7 +91,10 @@ public class MainActivity extends AppCompatActivity {
         String voucherPrice = data.getQueryParameter("voucherPrice");
         String voucherAmount = data.getQueryParameter("voucherAmount");
         String voucherSecret = data.getQueryParameter("voucherSecret");
-        return new String[]{"voucher", lnurl, voucherPrice, voucherAmount, voucherSecret};
+        String commissionPercentage = data.getQueryParameter("commissionPercentage");
+        String identifierCode = data.getQueryParameter("identifierCode");
+
+        return new String[]{"voucher", lnurl, voucherPrice, voucherAmount, voucherSecret, commissionPercentage, identifierCode};
     }
 
     private String[] extractPayData(Uri data) {
@@ -107,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     private void dispatchPrintRequest(String[] printData) {
         switch (printData[0]) {
             case "voucher":
-                printVoucherReceipt(printData[1], printData[2], printData[3], printData[4]);
+                printVoucherReceipt(printData[1], printData[2], printData[3], printData[4], printData[5], printData[6]);
                 break;
             default:
                 printPayReceipt(printData[1], printData[2], printData[3], printData[4], printData[5], printData[6]);
@@ -115,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void printVoucherReceipt(String lnurl, String voucherPrice, String voucherAmount, String voucherSecret) {
+    private void printVoucherReceipt(String lnurl, String voucherPrice, String voucherAmount, String voucherSecret, String commissionPercentage, String identifierCode) {
         singleThreadExecutor.submit(() -> {
             try {
                 PrintTextFormat dashedFormat = new PrintTextFormat();
@@ -137,24 +140,29 @@ public class MainActivity extends AppCompatActivity {
                 printerService.printText( dashedLine, dashedFormat);
 
                 //transaction data
-                printDynamicKeyValue("Price:" ,"          ", voucherPrice);
-                printDynamicKeyValue("Amount:","     ", voucherAmount);
-                printDynamicKeyValue("Secret:","        ", voucherSecret);
+                printDynamicKeyValue("Price:" ,"               ", voucherPrice);
+                printDynamicKeyValue("Value:","               ", voucherAmount);
+                printDynamicKeyValue("Identifier:","         ", identifierCode);
+                printDynamicKeyValue("Commission:","   ", commissionPercentage +  "%");
 
+                
                 //dashed line
                 printerService.printText( dashedLine , dashedFormat);
 
                 //QR
-                printerService.printQrCode(lnurl, 300, 300, 1);
+                printerService.printQrCode(lnurl, 350, 350, 1);
+                printerService.printText(dashedLine, dashedFormat);
+
+                PrintTextFormat appLink = new PrintTextFormat();
+                appLink.setAli(1);
+                appLink.setTextSize(25);
+                appLink.setStyle(1);
+                printerService.printText("voucher secret", appLink);
+                printerService.printText(formatVoucherSecret(voucherSecret), appLink);
 
                 // dashed line
                 printerService.printText( dashedLine, dashedFormat);
                 
-                //
-                PrintTextFormat appLink = new PrintTextFormat();
-                appLink.setAli(1);
-                appLink.setTextSize(23);
-                appLink.setStyle(1);
                 printerService.printText("voucher.blink.sv", appLink);
                 printerService.printText("\n", appLink);
 
@@ -169,6 +177,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public static String formatVoucherSecret(String secret) {
+        StringBuilder formatted = new StringBuilder();
+        for (int i = 0; i < secret.length(); i += 4) {
+            if (i > 0) {
+                formatted.append(" ");
+            }
+            formatted.append(secret.substring(i, Math.min(i + 4, secret.length())));
+        }
+        return formatted.toString();
+    }
 
     private void printPayReceipt(String username, String amount, String paymentHash, String transactionId, String date, String time) {
         singleThreadExecutor.submit(() -> {
